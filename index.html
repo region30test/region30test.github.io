@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Email Template Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HEADER / NAV BAR -->
+  <header class="app-header">
+    <h1>Email Generator</h1>
+  </header>
+
+  <main class="app-container">
+
+    <!-- TOP CONTROLS -->
+    <div class="controls">
+      <input
+        type="password"
+        id="password"
+        placeholder="Decryption password (ignored for plaintext)"
+      />
+      <button id="loadTemplates">Load Templates</button>
+      <span id="modeIndicator"></span>
+    </div>
+
+    <select id="templateSelect" disabled>
+      <option value="">Select a template</option>
+    </select>
+
+    <!-- TWO COLUMN LAYOUT -->
+    <div class="workspace">
+
+      <!-- LEFT: FORM -->
+      <section class="form-panel">
+        <h2>Template Fields</h2>
+        <form id="dynamicForm"></form><br>
+        <button id="generateEmail" disabled>Generate Email</button>
+      </section>
+
+      <!-- RIGHT: EMAIL OUTPUT -->
+<section class="email-panel">
+  <div class="email-header">
+    <h2>Generated Email</h2>
+    <button id="copyEmailBtn">Copy</button>
+  </div>
+
+  <div id="emailSubject" class="email-subject">Subject:</div>
+
+  <div
+    id="output"
+    class="email-output"
+    contenteditable="true"
+    spellcheck="false"
+  ></div>
+</section>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
