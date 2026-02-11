@@ -120,7 +120,7 @@ emailHTML = emailHTML.replace(/\{(.+?)\}/g, (_, expr) => {
 // TEMPLATE LOADING (OPTION A)
 // ===============================
 async function loadTemplates(password) {
-  const res = await fetch("./templates.json");
+  const res = await fetch("./templates.enc");
   const fileText = (await res.text()).trim();
 
   console.log("File loaded");
@@ -301,5 +301,6 @@ copyBtn.onclick = async () => {
     alert("Failed to copy email");
   }
 };
+
 
 
