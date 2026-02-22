@@ -1,0 +1,64 @@
+<h2>Amortization Schedule</h2>
+<div class="workspace">
+    <div class="controls">
+        <section class="form-panel">
+            <div>
+                <label>Loan Principal:</label>
+                <input type="text" id="principal">
+            </div>
+
+            <div>
+                <label>Interest Rate (%):</label>
+                <input type="text" id="rate">
+            </div>
+
+            <div>
+                <label>Payment:</label>
+                <input type="text" id="payment">
+            </div>
+
+            <div>
+                <label>Addon Per Payment:</label>
+                <input type="text" id="addon">
+            </div>
+
+            <div>
+                <label>Funding Date:</label>
+                <input type="date" id="fundingDate">
+            </div>
+
+            <div>
+                <label>First Payment Date:</label>
+                <input type="date" id="firstPayDate">
+            </div>
+
+            <div>
+                <label for="frequency">Payment Frequency:</label>
+                <select name="frequency" id="frequency">
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="semimonthly">Semi-Monthly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            
+            <button id="calcBtn">Calculate</button>
+        </section>
+    </div>
+
+
+    <br>
+</div>
+
+<div style="padding: 0 20px 10px;">
+  <button id="toggleColBtn" onclick="toggleColPanel()">⚙ Columns</button>
+  <div id="colPanel" style="display:none; background:white; border:1px solid #ccc; border-radius:10px; padding:16px; margin-top:8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <div id="colCheckboxes" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:8px;"></div>
+    <button onclick="selectAllCols(true)" style="margin-top:12px; margin-right:8px;">Select All</button>
+    <button onclick="selectAllCols(false)" style="margin-top:12px;">Deselect All</button>
+  </div>
+</div>
+
+<div style="padding: 0 20px 80px;">
+    <section class="form-panel" id="tableContainer"></section>
+</div>
