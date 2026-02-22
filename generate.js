@@ -1,3 +1,5 @@
+(() => {
+
 // ===============================
 // DOM ELEMENTS
 // ===============================
@@ -5,7 +7,6 @@ const loadBtn = document.getElementById("loadTemplates");
 const passwordInput = document.getElementById("password");
 const templateSelect = document.getElementById("templateSelect");
 const dynamicForm = document.getElementById("dynamicForm");
-const generateBtn = document.getElementById("generateEmail");
 const output = document.getElementById("output");
 const modeIndicator = document.getElementById("modeIndicator");
 
@@ -73,65 +74,19 @@ templateSelect.onchange = () => {
 };
 
 
-// ===============================
-// GENERATE EMAIL
-// ===============================
-generateBtn.onclick = () => {
-  const template = templates.find(t => t.id === templateSelect.value);
-  if (!template) return;
 
-  let emailHTML = template.body;
-  const formData = new FormData(dynamicForm);
-
-  formData.forEach((value, key) => {
-    emailHTML = emailHTML.replaceAll(
-      `[${key}]`,
-      escapeHTML(value)
-    );
-  });
-
-// Replace {Computed Expressions}
-emailHTML = emailHTML.replace(/\{(.+?)\}/g, (_, expr) => {
-  try {
-    const scope = {};
-    formData.forEach((val, key) => {
-      scope[key] = parseFloat(val) || 0;
-    });
-
-    // Replace variable names in expression with scope references
-    // e.g. "Current Payment + Partial Payment" → "scope['Current Payment'] + scope['Partial Payment']"
-    const safeExpr = expr.replace(/\b[\w ]+\b/g, match => {
-      if (match.trim() === "") return match; // skip empty
-      return `scope['${match.trim()}']`;
-    });
-
-    return new Function("scope", `return ${safeExpr}`)(scope);
-  } catch {
-    return `{${expr}}`;
-  }
-});
-
-
-
-  output.innerHTML = emailHTML;
-};
 
 // ===============================
 // TEMPLATE LOADING (OPTION A)
 // ===============================
 async function loadTemplates(password) {
-  const res = await fetch("./templates.enc");
+  const res = await fetch("./templates.json");
   const fileText = (await res.text()).trim();
-
-  console.log("File loaded");
 
   // ----- Quick plaintext check -----
   if (fileText.startsWith("{") || fileText.startsWith("[")) {
-    console.log("Detected plaintext JSON");
     return JSON.parse(fileText);
   }
-
-  console.log("Detected encrypted file, attempting decryption...");
 
   try {
     const ciphertext = CryptoJS.enc.Base64.parse(fileText);
@@ -158,7 +113,6 @@ async function loadTemplates(password) {
     return JSON.parse(plaintext);
 
   } catch (err) {
-    console.error("Template load failed:", err);
     throw new Error("Invalid template file or incorrect password.");
   }
 }
@@ -219,7 +173,9 @@ function renderEmail() {
         return `scope['${match.trim()}']`;
       });
 
-      return new Function("scope", `return ${safeExpr}`)(scope);
+    const result = new Function("scope", `return ${safeExpr}`)(scope);
+    const rounded = Math.round((result + Number.EPSILON) * 100) / 100;
+    return rounded.toFixed(2);
     } catch {
       return `{${expr}}`;
     }
@@ -242,7 +198,9 @@ function renderEmail() {
         return `scope['${match.trim()}']`;
       });
 
-      return new Function("scope", `return ${safeExpr}`)(scope);
+    const result = new Function("scope", `return ${safeExpr}`)(scope);
+    const rounded = Math.round((result + Number.EPSILON) * 100) / 100;
+    return rounded.toFixed(2);
     } catch {
       return `{${expr}}`;
     }
@@ -260,7 +218,9 @@ function renderEmail() {
         return `scope['${match.trim()}']`;
       });
 
-      return new Function("scope", `return ${safeExpr}`)(scope);
+    const result = new Function("scope", `return ${safeExpr}`)(scope);
+    const rounded = Math.round((result + Number.EPSILON) * 100) / 100;
+    return rounded.toFixed(2);
     } catch {
       return `{${expr}}`;
     }
@@ -302,5 +262,4 @@ copyBtn.onclick = async () => {
   }
 };
 
-
-
+})();
