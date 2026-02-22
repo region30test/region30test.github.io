@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // Redirect to index, passing the path as a query param
+    const path = window.location.pathname;
+    window.location.replace(`/your-repo-name/?page=${path.split('/').pop()}`);
+  </script>
+</head>
+<body></body>
+</html>
