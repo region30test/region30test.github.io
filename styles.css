@@ -6,8 +6,24 @@ body {
   background: #f5f6f8;
 }
 
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+nav a:hover {
+     text-decoration: underline;
+}
+
+#content {
+     padding: 30px;
+}
+
 /* ===== Header / Nav ===== */
-.app-header {
+nav {
   background: #005da5;
   color: white;
   padding: 16px 24px;
@@ -29,7 +45,6 @@ body {
 /* ===== Controls ===== */
 .controls {
   display: flex;
-  align-items: center;
   gap: 12px;
   margin-bottom: 15px;
 }
@@ -99,6 +114,28 @@ select {
   font-size: 1.1rem;
 }
 
+.form-panel div {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#frequency-extras {
+  display: contents;
+}
+
+.form-panel label {
+  font-weight: 500;
+}
+
+.form-panel input,
+.form-panel select {
+  margin-bottom: 0;
+}
+
+
+
 /* ===== Form ===== */
 form label {
   display: block;
@@ -161,3 +198,85 @@ form input {
   background: #004b87;
 }
 
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #f5f6f8;
+    padding: 15px;
+    text-align: center;
+}
+
+/* Grid layout */
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Card style */
+.card {
+    background: #f5f6f8;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Subtle hover effect */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+/* Card headings */
+.card h2 {
+    margin-top: 0;
+}
+
+/* Button styling */
+.card button {
+    margin-top: 15px;
+    padding: 8px 14px;
+    border: none;
+    background: #005da5;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.card button:hover {
+    background: #444;
+}
+
+/* Make the table section scrollable instead of squished */
+#tableContainer {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Give each cell a minimum width so headers don't overlap */
+.amort-table th,
+.amort-table td {
+  text-align: center;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;   /* prevents text wrapping in headers */
+}
+
+.amort-table th {
+  background: #005da5;
+  color: white;
+  font-size: 0.85rem;
+}
+
+th {
+  cursor: grab;
+}
+
+th:active {
+  cursor: grabbing;
+}
