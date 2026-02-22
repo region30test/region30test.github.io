@@ -1,65 +1,62 @@
 <!DOCTYPE html>
-<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Email Template Generator</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <title>My Tools</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- HEADER / NAV BAR -->
-  <header class="app-header">
-    <h1>Email Generator</h1>
-  </header>
+<nav>
+    <a href="#" data-page="home">Home</a>
+    <a href="#" data-page="generate">Generate Email</a>
+    <a href="#" data-page="amortization">Amortization Schedule</a>
+</nav>
 
-  <main class="app-container">
+<div id="content">
+    <!-- Page content loads here -->
+</div>
 
-    <!-- TOP CONTROLS -->
-    <div class="controls">
-      <input
-        type="password"
-        id="password"
-        placeholder="Decryption password (ignored for plaintext)"
-      />
-      <button id="loadTemplates">Load Templates</button>
-      <span id="modeIndicator"></span>
-    </div>
+<script>
+async function loadPage(pageName) {
+    const contentDiv = document.getElementById("content");
 
-    <select id="templateSelect" disabled>
-      <option value="">Select a template</option>
-    </select>
+    // Clear previous scripts
+    const oldScript = document.getElementById("page-script");
+    if (oldScript) oldScript.remove();
 
-    <!-- TWO COLUMN LAYOUT -->
-    <div class="workspace">
+    try {
+        const res = await fetch(`${pageName}.html?v=${Date.now()}`);
+        const html = await res.text();
+        contentDiv.innerHTML = html;
 
-      <!-- LEFT: FORM -->
-      <section class="form-panel">
-        <h2>Template Fields</h2>
-        <form id="dynamicForm"></form><br>
-      </section>
+        // Load corresponding JS file
+        const script = document.createElement("script");
+        script.src = `${pageName}.js?v=${Date.now()}`;
+        script.id = "page-script";
+        document.body.appendChild(script);
 
-      <!-- RIGHT: EMAIL OUTPUT -->
-<section class="email-panel">
-  <div class="email-header">
-    <h2>Generated Email</h2>
-    <button id="copyEmailBtn">Copy</button>
-  </div>
+    } catch (err) {
+        contentDiv.innerHTML = "<h2>Page not found</h2>";
+    }
+}
 
-  <div id="emailSubject" class="email-subject">Subject:</div>
+// Navigation handling
+document.querySelectorAll("nav a").forEach(link => {
+    link.addEventListener("click", e => {
+        e.preventDefault();
+        loadPage(link.dataset.page);
+    });
+});
 
-  <div
-    id="output"
-    class="email-output"
-    contenteditable="true"
-    spellcheck="false"
-  ></div>
-</section>
+// Default page
+loadPage("home");
+</script>
 
-    </div>
-  </main>
-
-  <script src="app.js"></script>
 </body>
-</html>
 
+
+<footer>
+    © 2026 Brodie Brenna | Internal Use Only
+</footer>
+</html>
