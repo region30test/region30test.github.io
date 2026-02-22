@@ -1,0 +1,49 @@
+  <main class="app-container">
+
+    <!-- TOP CONTROLS -->
+    <div class="controls">
+      <input
+        type="password"
+        id="password"
+        placeholder="Decryption password (ignored for plaintext)"
+      />
+      <button id="loadTemplates">Load Templates</button>
+      <span id="modeIndicator"></span>
+    </div>
+
+    <select id="templateSelect" disabled>
+      <option value="">Select a template</option>
+    </select>
+
+    <!-- TWO COLUMN LAYOUT -->
+    <div class="workspace">
+
+      <!-- LEFT: FORM -->
+      <section class="form-panel">
+        <h2>Template Fields</h2>
+        <form id="dynamicForm"></form><br>
+      </section>
+
+      <!-- RIGHT: EMAIL OUTPUT -->
+<section class="email-panel">
+  <div class="email-header">
+    <h2>Generated Email</h2>
+    <button id="copyEmailBtn">Copy</button>
+  </div>
+
+  <div id="emailSubject" class="email-subject">Subject:</div>
+
+  <div
+    id="output"
+    class="email-output"
+    contenteditable="true"
+    spellcheck="false"
+  ></div>
+</section>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
