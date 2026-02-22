@@ -80,7 +80,7 @@ templateSelect.onchange = () => {
 // TEMPLATE LOADING (OPTION A)
 // ===============================
 async function loadTemplates(password) {
-  const res = await fetch("./templates.json");
+  const res = await fetch("./templates.enc");
   const fileText = (await res.text()).trim();
 
   // ----- Quick plaintext check -----
@@ -263,3 +263,4 @@ copyBtn.onclick = async () => {
 };
 
 })();
+
