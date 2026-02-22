@@ -6,57 +6,55 @@
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
 <nav>
     <a href="#" data-page="home">Home</a>
     <a href="#" data-page="generate">Generate Email</a>
     <a href="#" data-page="amortization">Amortization Schedule</a>
 </nav>
-
 <div id="content">
     <!-- Page content loads here -->
 </div>
-
-<script>
-async function loadPage(pageName) {
-    const contentDiv = document.getElementById("content");
-
-    // Clear previous scripts
-    const oldScript = document.getElementById("page-script");
-    if (oldScript) oldScript.remove();
-
-    try {
-        const res = await fetch(`${pageName}.html?v=${Date.now()}`);
-        const html = await res.text();
-        contentDiv.innerHTML = html;
-
-        // Load corresponding JS file
-        const script = document.createElement("script");
-        script.src = `${pageName}.js?v=${Date.now()}`;
-        script.id = "page-script";
-        document.body.appendChild(script);
-
-    } catch (err) {
-        contentDiv.innerHTML = "<h2>Page not found</h2>";
-    }
-}
-
-// Navigation handling
-document.querySelectorAll("nav a").forEach(link => {
-    link.addEventListener("click", e => {
-        e.preventDefault();
-        loadPage(link.dataset.page);
-    });
-});
-
-// Default page
-loadPage("home");
-</script>
-
-</body>
-
-
 <footer>
     © 2026 Brodie Brenna | Internal Use Only
 </footer>
+<script>
+    async function loadPage(pageName) {
+        const contentDiv = document.getElementById("content");
+
+        // Remove any previously loaded page script
+        const oldScript = document.getElementById("page-script");
+        if (oldScript) oldScript.remove();
+
+        try {
+            const res = await fetch(`${pageName}.html?v=${Date.now()}`);
+            if (!res.ok) throw new Error("Not found");
+            const html = await res.text();
+            contentDiv.innerHTML = html;
+
+            // Load the corresponding JS file if it exists
+            const script = document.createElement("script");
+            script.src = `${pageName}.js?v=${Date.now()}`;
+            script.id = "page-script";
+            script.onerror = () => console.warn(`No JS file for: ${pageName}`);
+            document.body.appendChild(script);
+        } catch (err) {
+            contentDiv.innerHTML = "<p>Page not found.</p>";
+            console.error(err);
+        }
+    }
+
+    // Nav click handling
+    document.querySelectorAll("nav a").forEach(link => {
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            loadPage(link.dataset.page);
+        });
+    });
+
+    // On load, check for ?page= param (handles 404 redirects and direct links)
+    const params = new URLSearchParams(window.location.search);
+    const startPage = params.get("page") || "home";
+    loadPage(startPage);
+</script>
+</body>
 </html>
