@@ -1,5 +1,7 @@
 (() => {
 
+alert("This is actively being developed and tested. Please do not use this without verification. Many bugs are known and worked on being resolved. Thank you!")
+
 const TRANSACTION_TYPES = Object.freeze({
   PMT: {
     label: "Regular Payment",
