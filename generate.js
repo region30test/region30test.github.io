@@ -81,22 +81,33 @@ templateSelect.onchange = () => {
 // ===============================
 async function loadTemplates(password) {
   const res = await fetch("./templates.enc");
-  const fileText = (await res.text()).trim();
+  const fileText = (await res.text()).trim().replace(/^\uFEFF/, "");
 
-  // ----- Quick plaintext check -----
+  console.log("Raw file length:", fileText.length);
+  console.log("First 100 chars:", fileText.substring(0, 100));
+  console.log("Starts with { or [:", fileText.startsWith("{") || fileText.startsWith("["));
+
   if (fileText.startsWith("{") || fileText.startsWith("[")) {
     return JSON.parse(fileText);
   }
 
   try {
-    const ciphertext = CryptoJS.enc.Base64.parse(fileText);
-
     const key = CryptoJS.enc.Utf8.parse(
       password.padEnd(16).slice(0, 16)
     );
 
+    console.log("Key hex:", key.toString());
+    console.log("Password used:", JSON.stringify(password.padEnd(16).slice(0, 16)));
+
+    const wordArray = CryptoJS.enc.Base64.parse(fileText);
+    console.log("Parsed ciphertext word count:", wordArray.words.length);
+
+    const cipherParams = CryptoJS.lib.CipherParams.create({
+      ciphertext: wordArray
+    });
+
     const decrypted = CryptoJS.AES.decrypt(
-      { ciphertext },
+      cipherParams,
       key,
       {
         mode: CryptoJS.mode.ECB,
@@ -104,15 +115,17 @@ async function loadTemplates(password) {
       }
     );
 
+    console.log("Decrypted sigBytes:", decrypted.sigBytes);
     const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+    console.log("Plaintext length:", plaintext.length);
+    console.log("Plaintext first 100:", plaintext.substring(0, 100));
 
-    if (!plaintext) {
-      throw new Error("Decryption failed");
-    }
+    if (!plaintext) throw new Error("Decryption failed");
 
     return JSON.parse(plaintext);
 
   } catch (err) {
+    console.error("Decryption error:", err);
     throw new Error("Invalid template file or incorrect password.");
   }
 }
@@ -263,4 +276,5 @@ copyBtn.onclick = async () => {
 };
 
 })();
+
 
