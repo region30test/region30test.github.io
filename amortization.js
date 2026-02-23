@@ -1,7 +1,7 @@
 (() => {
 
-alert("This is actively being developed and tested. Please do not use this without verification. Many bugs are known and worked on being resolved. Thank you!")
-
+alert("This is a work in progress and is not ready for application. Testing is required to validate.")
+  
 const TRANSACTION_TYPES = Object.freeze({
   PMT: {
     label: "Regular Payment",
@@ -148,7 +148,9 @@ function generateSchedule(
   fundingDate,
   firstPaymentDate,
   frequency,
-  transactions = []
+  transactions = [],
+  smDay1 = 1,
+  smDay2 = 15
 ) {
   const schedule = [];
 
@@ -174,35 +176,56 @@ function generateSchedule(
   }
 
   // Advance a date by N days, return ISO string
-  function addDays(dateStr, n) {
-    const d = new Date(dateStr);
-    d.setDate(d.getDate() + n);
-    return d.toISOString().split("T")[0];
-  }
+ function addDays(dateStr, n) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setDate(d.getDate() + n);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
 
-  // Given a date, return the next scheduled payment date
-  function nextPaymentDate(currentDate, freq) {
-    const d = new Date(currentDate);
-    switch (freq) {
-      case "weekly":
-        return addDays(currentDate, 7);
-      case "biweekly":
-        return addDays(currentDate, 14);
-      case "monthly": {
-        const next = new Date(d);
-        next.setMonth(next.getMonth() + 1);
-        return next.toISOString().split("T")[0];
-      }
-      case "semimonthly": {
-        // Alternate between +15 days and end of month alignment
-        const next = new Date(d);
-        next.setDate(next.getDate() + 15);
-        return next.toISOString().split("T")[0];
-      }
-      default:
-        return addDays(currentDate, 30);
+function nextPaymentDate(currentDate, freq) {
+  const [year, month, day] = currentDate.split("-").map(Number);
+  switch (freq) {
+    case "weekly":
+      return addDays(currentDate, 7);
+
+    case "biweekly":
+      return addDays(currentDate, 14);
+
+    case "monthly": {
+      const next = new Date(year, month, day);
+      const y = next.getFullYear();
+      const m = String(next.getMonth() + 1).padStart(2, "0");
+      const dd = String(next.getDate()).padStart(2, "0");
+      return `${y}-${m}-${dd}`;
     }
+
+   case "semimonthly": {
+      // If current day is the first pay day, jump to second pay day same month
+      // If current day is the second pay day (or after), jump to first pay day next month
+      if (day <= smDay1) {
+        // Jump to smDay2 in the same month
+        const target = smDay2 === "last"
+          ? new Date(year, month, 0).getDate()  // last day of current month
+          : smDay2;
+        return `${year}-${String(month).padStart(2, "0")}-${String(target).padStart(2, "0")}`;
+      } else {
+        // Jump to smDay1 of next month
+        const next = new Date(year, month, 1); // 1st of next month
+        const y = next.getFullYear();
+        const m = String(next.getMonth() + 1).padStart(2, "0");
+        const target = String(smDay1).padStart(2, "0");
+        return `${y}-${m}-${target}`;
+      }
+    }
+
+    default:
+      return addDays(currentDate, 30);
   }
+}
 
   // Apply a cash amount to buckets in order: addon -> nsf -> interest -> principal
   // Returns an object describing how much went to each bucket
@@ -322,7 +345,7 @@ function generateSchedule(
       pastAddonDue    += addonPerPayment;
 
     } else if (type === "XTRA") {
-      applied = applyPayment(amount, 0, "XTRA"); // extra goes straight to principal
+      applied = applyPayment(amount, interestDue, "XTRA"); 
     }
 
     totalInterestPaid  += applied.interestPaid;
@@ -367,27 +390,30 @@ document.getElementById("calcBtn").addEventListener("click", () => {
     const fundingDate = document.getElementById("fundingDate").value;
     const addonAmount = parseFloat(document.getElementById("addon").value);
     const firstPayment = document.getElementById("firstPayDate").value;
-    if(frequency=="semimonthly"){
-        const firstMonthPayDay = document.getElementById("firstPayDay");
-        const secondMonthPayDay = document.getElementById("secondPayDay");
-        if(firstPayment.getDay() == firstMonthPayDay){
-            var schedule = generateSchedule(principal, APR, payment, addonAmount, fundingDate, firstPayment, secondMonthPayDay);
-        } else {
-            var schedule = generateSchedule(principal, APR, payment, addonAmount, fundingDate, firstPayment, firstMonthPayDay);
-        }
-    } else {
-        var schedule = generateSchedule(principal, APR, payment, addonAmount, fundingDate, firstPayment);
-    }
+    const freq = frequency.value;
 
-    
-    
-    lastSchedule = schedule; // save it
-    
+    let schedule;
+
+    if (freq === "semimonthly") {
+    const smDay1 = parseInt(document.getElementById("firstPayDay").value);
+    const smDay2raw = document.getElementById("secondPayDay").value;
+    const smDay2 = smDay2raw === "last" ? "last" : parseInt(smDay2raw);
+
+    schedule = generateSchedule(
+      principal, APR, payment, addonAmount,
+      fundingDate, firstPayment, freq,
+      [], 
+      smDay1,
+      smDay2
+    );
+} else {
+    schedule = generateSchedule(principal, APR, payment, addonAmount, fundingDate, firstPayment, freq);
+}
+
+    lastSchedule = schedule;
     const tableContainer = document.getElementById("tableContainer");
     tableContainer.innerHTML = "";
     tableContainer.appendChild(renderTable(schedule));
-
-    //principal * (rate * Math.pow(1 + rate, years)) / (Math.pow(1 + rate, years) - 1);
 });
 
 // Build the checkbox panel from TABLE_HEADERS
